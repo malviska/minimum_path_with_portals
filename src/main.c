@@ -4,6 +4,10 @@
 #include<stdlib.h>
 
 
+void dijkstra(Graph * graph, int * distances, int ** coord){
+  
+}
+
 int main(){
   int n, m, k;
   int s, q;
@@ -19,7 +23,7 @@ int main(){
     scanf("%d %d", &x, &y);
     coord[i][0] = x;
 
-    
+
     coord[i][1] = y;
   }
   for(int i = 0; i<m; i++){

@@ -2,11 +2,11 @@
 #include "heap.h"
 
 
-Path * pathNew(int vertex, int distance, Path * predecessor){
+Path * pathNew(int vertex, int distance, int portals){
   Path * path = (Path *)malloc(sizeof(Path));
   path->distance = distance;
   path->vertex = vertex;
-  path->predecessor = predecessor;
+  path->portals = portals;
   return path;
 }
 
@@ -38,12 +38,12 @@ void heapDelete(Heap* h){
   free(h);
 }
 
-void heapInsert(Heap* h, int vertex, int distance, Path * predecessor){
+void heapInsert(Heap* h, int vertex, int distance, int portals){
   if(h->size >= h->capacity - 1){
     heapResize(h);
   }
   int pos = h->size;
-  h->paths[pos] = pathNew(vertex, distance, predecessor);
+  h->paths[pos] = pathNew(vertex, distance, portals);
   int ancPos = heapGetAncestor(h, pos);
   while(h->paths[pos]->distance < h->paths[ancPos]->distance && ancPos != -1){
     Path * aux = h->paths[ancPos];
@@ -68,12 +68,12 @@ Path * heapRemove(Heap* h){
       s = posEsq;
     }else if(posEsq == -1){
       s = posDir;
-    }else if(h->paths[posEsq] < h->paths[posDir]){
+    }else if(h->paths[posEsq]->distance < h->paths[posDir]->distance){
       s = posEsq;
     }else{
       s = posDir;
     }
-    if(h->paths[i] > h->paths[s]){
+    if(h->paths[i]->distance > h->paths[s]->distance){
       Path * aux = h->paths[s];
       h->paths[s] = h->paths[i];
       h->paths[i] = aux;
@@ -96,8 +96,8 @@ int heapGetAncestor(Heap* h, int position){
     return -1;
 }
 
-int heapGetSuccessorLeft(Heap* h, int posicao){
-  int sucEsq = 2*posicao+1;
+int heapGetSuccessorLeft(Heap* h, int position){
+  int sucEsq = 2*position+1;
   if(sucEsq < h->size){
     return sucEsq;
   }else{
@@ -105,8 +105,8 @@ int heapGetSuccessorLeft(Heap* h, int posicao){
   }
 }
 
-int heapGetSuccessorRight(Heap* h, int posicao){
-  int sucDir = 2*posicao+2;
+int heapGetSuccessorRight(Heap* h, int position){
+  int sucDir = 2*position+2;
   if(sucDir < h->size){
     return sucDir;
   }else{
@@ -120,4 +120,12 @@ int heapEmpty(Heap* h){
   }
 
   return 0;
+}
+
+void heapDestroy(Heap * h){
+  for(int i = 0; i< h->size; i++){
+    free(h->paths[i]);
+  }
+  free(h->paths);
+  free(h);
 }
