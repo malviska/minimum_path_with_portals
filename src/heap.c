@@ -1,94 +1,121 @@
 #include <stdlib.h>
 #include "heap.h"
 
-Heap* NovoHeap(int maxsize){
+
+Path * pathNew(int vertex, int distance, Path * predecessor){
+  Path * path = (Path *)malloc(sizeof(Path));
+  path->distance = distance;
+  path->vertex = vertex;
+  path->predecessor = predecessor;
+  return path;
+}
+
+Heap* heapNew(int initalCapacity){
   Heap * minHeap = (Heap *)malloc(sizeof(Heap));
-  minHeap->tamanho = 0;
-  minHeap->dados = (int *)malloc(maxsize * sizeof(int));
+  minHeap->capacity = initalCapacity;
+  minHeap->size = 0;
+  minHeap->paths = (Path **)malloc(initalCapacity * sizeof(Path*));
+
+  for(int i = 0; i<initalCapacity; i++){
+    minHeap->paths[i] = NULL;
+  }
 
   return minHeap;
 }
 
+void heapResize(Heap * h){
+  int inital = h->capacity;
+  h->capacity = 2*h->capacity;
+  h->paths = (Path **)realloc(h->paths, h->capacity*sizeof(Path*));
+  for(int i = inital; i<h->capacity; i++){
+    h->paths[i] = NULL;
+  }
+}
 
-void DeletaHeap(Heap* h){
-  free(h->dados);
+
+void heapDelete(Heap* h){
+  free(h->paths);
   free(h);
 }
 
-void Inserir(Heap* h, int x){
-  int pos = h->tamanho;
-  h->dados[pos] = x;
-  int ancPos = GetAncestral(h, pos);
-  while(h->dados[pos] < h->dados[ancPos] && ancPos != -1){
-    int aux = h->dados[ancPos];
-    h->dados[ancPos] = h->dados[pos];
-    h->dados[pos] = aux;
-    pos = ancPos;
-    ancPos = GetAncestral(h, pos);
+void heapInsert(Heap* h, int vertex, int distance, Path * predecessor){
+  if(h->size >= h->capacity - 1){
+    heapResize(h);
   }
-  h->tamanho++;
+  int pos = h->size;
+  h->paths[pos] = pathNew(vertex, distance, predecessor);
+  int ancPos = heapGetAncestor(h, pos);
+  while(h->paths[pos]->distance < h->paths[ancPos]->distance && ancPos != -1){
+    Path * aux = h->paths[ancPos];
+    h->paths[ancPos] = h->paths[pos];
+    h->paths[pos] = aux;
+    pos = ancPos;
+    ancPos = heapGetAncestor(h, pos);
+  }
+  h->size++;
 }
 
-int Remover(Heap* h){
-  int x = h->dados[0];
-  h->dados[0] = h->dados[h->tamanho-1];
-  h->tamanho--;
+Path * heapRemove(Heap* h){
+  Path * x = h->paths[0];
+  h->paths[0] = h->paths[h->size-1];
+  h->size--;
   int i = 0;
   int s;
-  int posEsq = GetSucessorEsq(h, 0);
-  int posDir = GetSucessorDir(h, 0);
+  int posEsq = heapGetSuccessorLeft(h, 0);
+  int posDir = heapGetSuccessorRight(h, 0);
   while(posDir != -1 || posEsq != -1){
     if(posDir == -1){
       s = posEsq;
     }else if(posEsq == -1){
       s = posDir;
-    }else if(h->dados[posEsq] < h->dados[posDir]){
+    }else if(h->paths[posEsq] < h->paths[posDir]){
       s = posEsq;
     }else{
       s = posDir;
     }
-    if(h->dados[i] > h->dados[s]){
-      int aux = h->dados[s];
-      h->dados[s] = h->dados[i];
-      h->dados[i] = aux;
+    if(h->paths[i] > h->paths[s]){
+      Path * aux = h->paths[s];
+      h->paths[s] = h->paths[i];
+      h->paths[i] = aux;
       i = s;
     }else{
       break;
     }
-    posEsq = GetSucessorEsq(h, i);
-    posDir = GetSucessorDir(h, i);
+    posEsq = heapGetSuccessorLeft(h, i);
+    posDir = heapGetSuccessorRight(h, i);
   }
 
   return x;
 }
 
-int GetAncestral(Heap* h, int posicao){
-  int ancPos = (posicao-1)/2;
+int heapGetAncestor(Heap* h, int position){
+  int ancPos = (position-1)/2;
   if(ancPos >= 0)
     return ancPos;
   else
     return -1;
 }
-int GetSucessorEsq(Heap* h, int posicao){
+
+int heapGetSuccessorLeft(Heap* h, int posicao){
   int sucEsq = 2*posicao+1;
-  if(sucEsq < h->tamanho){
+  if(sucEsq < h->size){
     return sucEsq;
   }else{
     return -1;
   }
 }
-int GetSucessorDir(Heap* h, int posicao){
+
+int heapGetSuccessorRight(Heap* h, int posicao){
   int sucDir = 2*posicao+2;
-  if(sucDir < h->tamanho){
+  if(sucDir < h->size){
     return sucDir;
   }else{
     return -1;
   }
 }
 
-//Retorna 1 caso h esteja vazio, 0 caso contrário.
-int Vazio(Heap* h){
-  if(h->tamanho == 0){
+int heapEmpty(Heap* h){
+  if(h->size == 0){
     return 1;
   }
 

@@ -1,23 +1,32 @@
 #ifndef HEAP_HPP
 #define HEAP_HPP
-
-typedef struct s_heap{
-    int tamanho;
-    int* dados;
+typedef struct Heap{
+    int capacity;
+    int size;
+    struct Path ** paths;
 } Heap;
 
-Heap* NovoHeap(int maxsize);
-void DeletaHeap(Heap* h);
+typedef struct Path {
+  int vertex;
+  int distance;
+  struct Path * predecessor;
+} Path;
 
-void Inserir(Heap* h, int x);
-int Remover(Heap* h);
 
-int GetAncestral(Heap* h, int posicao);
-int GetSucessorEsq(Heap* h, int posicao);
-int GetSucessorDir(Heap* h, int posicao);
+Path * pathNew(int vertex, int distance, Path * predecessor);
 
-//Retorna 1 caso h esteja vazio, 0 caso contrário.
-int Vazio(Heap* h); 
+Heap* heapNew(int initialCapacity);
+void heapResize(Heap * h);
+void heapDelete(Heap* h);
+
+void heapInsert(Heap* h, int x);
+int heapRemove(Heap* h);
+
+int heapGetAncestor(Heap* h, int posicao);
+int heapGetSuccessorLeft(Heap* h, int posicao);
+int heapGetSuccessorRight(Heap* h, int posicao);
+
+int heapEmpty(Heap* h);
 
 
 #endif

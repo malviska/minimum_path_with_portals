@@ -18,6 +18,8 @@ int main(){
     int x, y;
     scanf("%d %d", &x, &y);
     coord[i][0] = x;
+
+    
     coord[i][1] = y;
   }
   for(int i = 0; i<m; i++){
