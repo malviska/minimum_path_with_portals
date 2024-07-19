@@ -3,7 +3,7 @@
 
 typedef struct Node {
   int vertex;
-  int portal;
+  int portal; // 0 or 1
   struct Node* next;
 } Node;
 

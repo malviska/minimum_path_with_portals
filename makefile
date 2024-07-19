@@ -16,7 +16,7 @@ TARGET := ./bin/tp2.out
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lm
 
 ./obj/%.o: ./src/%.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@

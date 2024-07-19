@@ -8,23 +8,23 @@ typedef struct Heap{
 
 typedef struct Path {
   int vertex;
-  int distance;
+  double distance;
   int portals;
 } Path;
 
 
-Path * pathNew(int vertex, int distance, int portals);
+Path * pathNew(int vertex, double distance, int portals);
 
 Heap* heapNew(int initialCapacity);
 void heapResize(Heap * h);
-void heapDelete(Heap* h);
-void heapInsert(Heap* h,int vertex, int distance, int portals);
-int heapRemove(Heap* h);
+void heapInsert(Heap* h,int vertex, double distance, int portals);
+Path * heapRemove(Heap* h);
 int heapGetAncestor(Heap* h, int position);
 int heapGetSuccessorLeft(Heap* h, int position);
 int heapGetSuccessorRight(Heap* h, int position);
 int heapEmpty(Heap* h);
 void heapDestroy(Heap * heap);
+void heapPrint(Heap * heap);
 
 
 #endif

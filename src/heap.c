@@ -1,8 +1,9 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "heap.h"
 
 
-Path * pathNew(int vertex, int distance, int portals){
+Path * pathNew(int vertex, double distance, int portals){
   Path * path = (Path *)malloc(sizeof(Path));
   path->distance = distance;
   path->vertex = vertex;
@@ -32,13 +33,7 @@ void heapResize(Heap * h){
   }
 }
 
-
-void heapDelete(Heap* h){
-  free(h->paths);
-  free(h);
-}
-
-void heapInsert(Heap* h, int vertex, int distance, int portals){
+void heapInsert(Heap* h, int vertex, double distance, int portals){
   if(h->size >= h->capacity - 1){
     heapResize(h);
   }
@@ -58,6 +53,7 @@ void heapInsert(Heap* h, int vertex, int distance, int portals){
 Path * heapRemove(Heap* h){
   Path * x = h->paths[0];
   h->paths[0] = h->paths[h->size-1];
+  h->paths[h->size-1] = NULL;
   h->size--;
   int i = 0;
   int s;
@@ -90,40 +86,31 @@ Path * heapRemove(Heap* h){
 
 int heapGetAncestor(Heap* h, int position){
   int ancPos = (position-1)/2;
-  if(ancPos >= 0)
-    return ancPos;
-  else
-    return -1;
+  return (ancPos >= 0) ? ancPos : -1;
 }
 
 int heapGetSuccessorLeft(Heap* h, int position){
   int sucEsq = 2*position+1;
-  if(sucEsq < h->size){
-    return sucEsq;
-  }else{
-    return -1;
-  }
+  return (sucEsq < h->size) ? sucEsq : -1;
 }
 
 int heapGetSuccessorRight(Heap* h, int position){
   int sucDir = 2*position+2;
-  if(sucDir < h->size){
-    return sucDir;
-  }else{
-    return -1;
-  }
+  return (sucDir < h->size) ? sucDir : -1;
 }
 
 int heapEmpty(Heap* h){
-  if(h->size == 0){
-    return 1;
-  }
+  return (h->size > 0) ? 0 : 1;
+}
 
-  return 0;
+void heapPrint(Heap * h){
+  for(int i = 0; i< h->size; i++){
+    printf("%d %.4f % d\n", h->paths[i]->vertex, h->paths[i]->distance, h->paths[i]->portals);
+  }
 }
 
 void heapDestroy(Heap * h){
-  for(int i = 0; i< h->size; i++){
+  for(int i = 0; i< h->capacity; i++){
     free(h->paths[i]);
   }
   free(h->paths);
