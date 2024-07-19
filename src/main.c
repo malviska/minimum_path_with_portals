@@ -1,13 +1,18 @@
 #include "heap.h"
 #include "graph.h"
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <float.h>
+
 
 
 void dijkstra(Graph * graph, double * distances, double ** coord, int maxPortals){
+  for (size_t i = 0; i<graph->size; i++){
+    distances[i] = DBL_MAX;
+  }
   Heap * minHeap = heapNew(graph->size*2);
-  heapInsert(minHeap, 0, distances[0], 0);
+  heapInsert(minHeap, 0, 0, 0);
   while(heapEmpty(minHeap) == 0){
     Path * path = heapRemove(minHeap);
     if(distances[path->vertex] < path->distance || path->portals > maxPortals){
@@ -22,7 +27,7 @@ void dijkstra(Graph * graph, double * distances, double ** coord, int maxPortals
         double y = coord[node->vertex][1];
         double x_init = coord[path->vertex][0];
         double y_init = coord[path->vertex][1];
-        d = -sqrt(pow(x-x_init, 2) + pow(y-y_init, 2)) + d;
+        d = sqrt(pow(x-x_init, 2) + pow(y-y_init, 2)) + d;
        }
       int portals = node->portal + path->portals;
       heapInsert(minHeap, node->vertex, d, portals);
@@ -65,7 +70,7 @@ int main(){
 
   printGraph(graph);
 
-  double * distances = (double *)calloc(graph->size, sizeof(double));
+  double * distances = (double *)malloc(graph->size * sizeof(double));
   dijkstra(graph, distances, coord, q);
 
   for(int i = 0; i<graph->size; i++){
