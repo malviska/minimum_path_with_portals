@@ -34,7 +34,7 @@ void heapResize(Heap * h){
 }
 
 void heapInsert(Heap* h, int vertex, double distance, int portals){
-  if(h->size >= h->capacity - 1){
+  if(h->size + 1 >= h->capacity - 1){
     heapResize(h);
   }
   int pos = h->size;

@@ -11,9 +11,11 @@ Node * createNode(int vertex, int portal){
   return node;
 }
 
-Graph * createGraph(int size){
+Graph * createGraph(int size, int totalPaths, int totalPortals){
   Graph * graph = (Graph *)malloc(sizeof(Graph));
   graph->size = size;
+  graph->totalPaths = totalPaths;
+  graph->totalPortals = totalPortals;
   graph->adjList = (Node **)malloc(size*sizeof(Node*));
 
   for(int i=0; i<size; i++){
