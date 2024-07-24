@@ -4,6 +4,9 @@
 
 
 Path * pathNew(int vertex, double distance, int portals){
+  /*
+   Create a new path unit that represents a edge in a heap, based on the edge characteristics
+  */
   Path * path = (Path *)malloc(sizeof(Path));
   path->distance = distance;
   path->vertex = vertex;
@@ -12,6 +15,9 @@ Path * pathNew(int vertex, double distance, int portals){
 }
 
 Heap* heapNew(int initalCapacity){
+  /*
+   Create a new heap with initial capacity given but dynamic allocated
+  */
   Heap * minHeap = (Heap *)malloc(sizeof(Heap));
   minHeap->capacity = initalCapacity;
   minHeap->size = 0;
@@ -25,6 +31,9 @@ Heap* heapNew(int initalCapacity){
 }
 
 void heapResize(Heap * h){
+  /*
+    Dynamic allocate the heap
+  */
   int inital = h->capacity;
   h->capacity = 2*h->capacity;
   h->paths = (Path **)realloc(h->paths, h->capacity*sizeof(Path*));
@@ -34,6 +43,9 @@ void heapResize(Heap * h){
 }
 
 void heapInsert(Heap* h, int vertex, double distance, int portals){
+  /*
+   Insert new path and heapfy considering the minimum distance
+  */
   if(h->size + 1 >= h->capacity - 1){
     heapResize(h);
   }
@@ -51,6 +63,9 @@ void heapInsert(Heap* h, int vertex, double distance, int portals){
 }
 
 Path * heapRemove(Heap* h){
+  /*
+   Remove top from heap and return it, top is the minimum distance path
+  */
   Path * x = h->paths[0];
   h->paths[0] = h->paths[h->size-1];
   h->paths[h->size-1] = NULL;
@@ -84,6 +99,7 @@ Path * heapRemove(Heap* h){
   return x;
 }
 
+// helper functions
 int heapGetAncestor(Heap* h, int position){
   int ancPos = (position-1)/2;
   return (ancPos >= 0) ? ancPos : -1;

@@ -92,12 +92,6 @@ int main(int argc, char* argv[]) {
   int euclideanPaths = 0;
   int portals = 0;
 
-  // for (int i = 0; i< numVertices-1; ++i){
-  //   double weight = euclideanDistance(graph[vrts[i]], graph[vrts[i+1]]);
-  //   add_edge(vrts[i], vrts[i+1], EdgeTrait{weight}, graph);
-  //   euclideanPaths++;
-  // }
-
   for(int i = 0; i< numVertices; i++){
     int random_value = std::round(normalPath(gen));
     //std::cout<<"paths: "<<random_value<<std::endl;
@@ -130,27 +124,7 @@ int main(int argc, char* argv[]) {
       k++;
     }
   }
-  // for(int i = 0; i< numVertices; i++){
-  //   for(int j = 0; j< numVertices; j++){
-  //     if (i == j){
-  //       continue;
-  //     }
-  //     double randomProbability = dis(gen);
-  //     if (randomProbability < chanceOfEdge){
-  //       double weight = euclideanDistance(graph[vrts[i]], graph[vrts[j]]);
-  //       add_edge(vrts[i], vrts[j], EdgeTrait{weight}, graph);
-  //       euclideanPaths++;
-  //       continue;
-  //     }
-  //     randomProbability = dis(gen);
-  //     if(randomProbability < chanceOfPortal){
-  //       double weight = 0;
-  //       add_edge(vrts[i], vrts[j], EdgeTrait{weight}, graph);
-  //       portals++;
-  //       continue;
-  //     }
-  //   }
-  // }
+
   auto weightmap = boost::get(&EdgeTrait::weight, graph);
   std::vector<double> distances(num_vertices(graph), std::numeric_limits<double>::infinity());
   std::vector<Vertex> p(num_vertices(graph));

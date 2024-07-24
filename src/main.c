@@ -134,24 +134,22 @@ int main(){
     int v1, v2, portal = 0;
     scanf("%d %d", &v1, &v2);
     addEdge(graph, v1, v2, portal);
-    addEdge(graph, v2, v1, portal); // test case
+    // addEdge(graph, v2, v1, portal); // test case undirected graph
   }
   for(int i = 0; i<k; i++){
     int v1, v2;
     scanf("%d %d", &v1, &v2);
     addEdge(graph, v1, v2, 0);
     addEdge(graph, v1, v2, 1);
-    addEdge(graph, v2, v1, 0); // test case
-    addEdge(graph, v2, v1, 1); // test case
+    // addEdge(graph, v2, v1, 0); // test case undirected graph
+    // addEdge(graph, v2, v1, 1); // test case undirected graph
   }
   scanf("%lf %d", &s, &q);
 
   double * distances = (double *)malloc(graph->size * sizeof(double)); //creating the distances vector
   dijkstra(graph, distances, coord, q);
-  printf("\n%lf\n", distances[graph->size-1]);
   int dijkstra_result = (distances[graph->size-1] <= s) ? 1 : 0; // simple test if the last distance is less than energy
   A_star(graph, euclideanDistance, distances, coord, q);
-  printf("%lf\n", distances[graph->size-1]);
   int a_star_result = (distances[graph->size-1] <= s) ? 1 : 0; // simple test if the last distance is less than energy
   
   //print result
