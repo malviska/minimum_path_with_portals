@@ -146,8 +146,6 @@ int main(){
   }
   scanf("%lf %d", &s, &q);
 
-  printGraph(graph);
-
   double * distances = (double *)malloc(graph->size * sizeof(double)); //creating the distances vector
   dijkstra(graph, distances, coord, q);
   printf("\n%lf\n", distances[graph->size-1]);

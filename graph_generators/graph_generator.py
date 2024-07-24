@@ -1,13 +1,14 @@
 import networkx as nx
 import random
 import math
+import sys
 
 def euclideanDistance(pos1, pos2):
   return math.sqrt(math.pow(pos1[0] - pos2[0], 2) + math.pow(pos1[1] - pos2[1], 2))
 
 def generate_random_connected_graph(n, width, height):
   #while True:
-  G:nx.Graph = nx.gnp_random_graph(n, 0.3)  # Generate random graph
+  G:nx.Graph = nx.gnp_random_graph(n, 0.000001)  # Generate random graph
     # if nx.is_connected(G):  # Ensure the graph is connected
     #   break
 
@@ -40,29 +41,41 @@ def generate_random_connected_graph(n, width, height):
     if(portal):
       portalCount += 1
       G[u][v]['weight'] = 0
+      G[v][u]['weight'] = 0
     else:
       pathsCount += 1
       G[u][v]['weight'] = euclideanDistance(position1, position2)
-  with open('./tests/graphtest.txt', 'w') as file:
+      G[v][u]['weight'] = euclideanDistance(position1, position2)
+  with open('./tests/graphtest2.txt', 'w') as file:
     file.write(f'{n} {pathsCount} {portalCount}\n')
-    for node in G.nodes:
+    for node in sorted(G.nodes):
       pos = G.nodes[node]['pos']
       file.write(f'{pos[0]} {pos[1]}\n')
     for u, v in G.edges:
       if G[u][v]['weight'] > 0:
-        file.write(f'{u} {v}\n')
+        if u < v:
+          file.write(f'{u} {v}\n')
+        else:
+          file.write(f'{v} {u}\n')
     for u, v in G.edges:
       if G[u][v]['weight'] == 0:
-        file.write(f'{u} {v}\n')
+        if u < v:
+          file.write(f'{u} {v}\n')
+        else:
+          file.write(f'{v} {u}\n')
+    file.write(f'{width*height} {portalCount}')
 
   return G
 
-G = generate_random_connected_graph(11, 100, 100)
-shortest_path_length = nx.shortest_path_length(G, 0, 10, 'weight')
-print(shortest_path_length)
-pos = nx.get_node_attributes(G, 'pos')
+n = int(sys.argv[1])
+G = generate_random_connected_graph(n, 100000, 100000)
+#shortest_path_length = nx.shortest_path_length(G, 0, n-1, 'weight')
+# shortest_path = nx.shortest_path(G, 0, n-1, 'weight')
+# print(shortest_path_length)
+# print(shortest_path)
+# pos = nx.get_node_attributes(G, 'pos')
 
 # Visualization (requires matplotlib)
-import matplotlib.pyplot as plt
-nx.draw(G, pos, with_labels=True)
-plt.show()
+# import matplotlib.pyplot as plt
+# nx.draw(G, pos, with_labels=False)
+# plt.show()
