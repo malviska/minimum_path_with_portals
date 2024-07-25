@@ -15,10 +15,13 @@ LINK_OBJS_MATRIX := $(filter-out ./obj/main.o, $(OBJS)) # Adjacency Matrix
 # Target executable
 TARGET := ./bin/tp2.out # Adjacency List
 MATRIX := ./bin/matrix.out # Adjacency Matrix
+GRAPH := ./bin/gen.out # boost digraph generator
 
 all: $(TARGET) # Run Adjacency List implementation
 
 matrix: $(MATRIX) # Run Adjacency Matrix
+
+gen: $(GRAPH) # Compile boost digraph generator
 
 $(TARGET): $(LINK_OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lm
@@ -26,8 +29,11 @@ $(TARGET): $(LINK_OBJS)
 $(MATRIX): $(LINK_OBJS_MATRIX)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lm
 
+$(GRAPH): ./graph_generators/digraph_generator.cpp
+	g++ -o ./bin/gen.out -std=c++11 -g -lm ./graph_generators/digraph_generator.cpp
+
 ./obj/%.o: ./src/%.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET) $(MATRIX) $(GRAPH)
