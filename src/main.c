@@ -5,6 +5,27 @@
 #include <math.h>
 #include <float.h>
 #include <string.h>
+#include <unistd.h>
+#include <time.h>
+
+#define _POSIX_C_SOURCE 199309L
+
+void clkDiff(struct timespec t1, struct timespec t2,
+                   struct timespec * res)
+// Descricao: calcula a diferenca entre t2 e t1, que e armazenada em res
+// Entrada: t1, t2
+// Saida: res
+{
+  if (t2.tv_nsec < t1.tv_nsec){
+    // ajuste necessario, utilizando um segundo de tv_sec
+    res-> tv_nsec = 1000000000+t2.tv_nsec-t1.tv_nsec;
+    res-> tv_sec = t2.tv_sec-t1.tv_sec-1;
+  } else {
+    // nao e necessario ajuste
+    res-> tv_nsec = t2.tv_nsec-t1.tv_nsec;
+    res-> tv_sec = t2.tv_sec-t1.tv_sec;
+  }
+}
 
 double euclideanDistance(double ** coord, int initial, int goal){
   /*
@@ -112,6 +133,8 @@ void dijkstra(Graph * graph, double * distances, double ** coord, int maxPortals
 }
 
 int main(){
+  struct timespec inittp, endtp, restp;
+  int retp;
   int n, m, k;
   double s;
   int q;
@@ -147,13 +170,29 @@ int main(){
   scanf("%lf %d", &s, &q);
 
   double * distances = (double *)malloc(graph->size * sizeof(double)); //creating the distances vector
+
+  retp = clock_gettime(CLOCK_MONOTONIC, &inittp);
   dijkstra(graph, distances, coord, q);
+  retp = clock_gettime(CLOCK_MONOTONIC, &endtp);
+  clkDiff(inittp, endtp, &restp);
+  long dijkstra_sec = restp.tv_sec;
+  long dijkstra_nsec = restp.tv_nsec;
+  double dijkstra_distance = distances[graph->size-1];
+
   int dijkstra_result = (distances[graph->size-1] <= s) ? 1 : 0; // simple test if the last distance is less than energy
+  retp = clock_gettime(CLOCK_MONOTONIC, &inittp);
   A_star(graph, euclideanDistance, distances, coord, q);
+  retp = clock_gettime(CLOCK_MONOTONIC, &endtp);
+  clkDiff(inittp, endtp, &restp);
+  long a_star_sec = restp.tv_sec;
+  long a_star_nsec = restp.tv_nsec;
+  double a_star_distance = distances[graph->size-1];
+  printf("list,%d,%d,%d,%ld.%.9ld,%.4lf,%ld.%.9ld,%.4lf\n", n, m, k, dijkstra_sec, dijkstra_nsec, dijkstra_distance, a_star_sec, a_star_nsec, a_star_distance);
+
   int a_star_result = (distances[graph->size-1] <= s) ? 1 : 0; // simple test if the last distance is less than energy
   
   //print result
-  printf("%d %d\n", dijkstra_result, a_star_result);
+  //printf("%d %d\n", dijkstra_result, a_star_result);
 
   //deallocate memory
   free(distances);

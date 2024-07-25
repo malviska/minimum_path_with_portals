@@ -7,11 +7,12 @@
 #include <random>
 #include <cmath>
 #include <fstream>
+
 using namespace boost;
 
-#define VERTICES 10
-#define CHANCE_OF_PATH 0.3
-#define CHANCE_OF_PORTAL 0.1
+#define VERTICES 50000
+#define CHANCE_OF_PATH 0.05
+#define CHANCE_OF_PORTAL 0.01
 #define QUADRANT 1000000
 
 struct EdgeTrait {
