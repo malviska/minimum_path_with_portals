@@ -30,16 +30,16 @@ graph: $(GRAPH)
 	$(GRAPH)
 
 $(TARGET): $(LINK_OBJS)
-	$(CXX) $(CXXFLAGS) $(CXXFAST) -o $@ $^ -lm
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lm
 
 $(MATRIX): $(LINK_OBJS_MATRIX)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lm
 
 $(GRAPH): ./graph_generators/digraph_generator.cpp
-	g++ -o ./bin/gen.out $(CXXFAST) -std=c++11 -g -lm ./graph_generators/digraph_generator.cpp
+	g++ -o ./bin/gen.out -std=c++11 -g -lm ./graph_generators/digraph_generator.cpp
 
 ./obj/%.o: ./src/%.c
-	$(CXX) $(CXXFLAGS) $(CXXFAST) -c $< -D_POSIX_C_SOURCE=199309L -o $@
+	$(CXX) $(CXXFLAGS) -c $< -D_POSIX_C_SOURCE=199309L -o $@
 
 clean:
 	rm -f $(OBJS) $(TARGET) $(MATRIX) $(GRAPH)

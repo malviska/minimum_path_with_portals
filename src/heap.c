@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "heap.h"
+#include "config.h"
 
 
 Path * pathNew(int vertex, double distance, int portals){
   /*
    Create a new path unit that represents a edge in a heap, based on the edge characteristics
   */
+  allocs++;
+  memoryUsage += sizeof(Path);
   Path * path = (Path *)malloc(sizeof(Path));
   path->distance = distance;
   path->vertex = vertex;
@@ -18,9 +21,13 @@ Heap* heapNew(int initalCapacity){
   /*
    Create a new heap with initial capacity given but dynamic allocated
   */
+  allocs++;
+  memoryUsage += sizeof(Heap);
   Heap * minHeap = (Heap *)malloc(sizeof(Heap));
   minHeap->capacity = initalCapacity;
   minHeap->size = 0;
+  allocs++;
+  memoryUsage += initalCapacity * sizeof(Path*);
   minHeap->paths = (Path **)malloc(initalCapacity * sizeof(Path*));
 
   for(int i = 0; i<initalCapacity; i++){
@@ -36,6 +43,8 @@ void heapResize(Heap * h){
   */
   int inital = h->capacity;
   h->capacity = 2*h->capacity;
+  allocs++;
+  memoryUsage += (h->capacity-inital) * sizeof(Path*);
   h->paths = (Path **)realloc(h->paths, h->capacity*sizeof(Path*));
   for(int i = inital; i<h->capacity; i++){
     h->paths[i] = NULL;

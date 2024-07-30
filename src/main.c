@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include "config.h"
 
 #define _POSIX_C_SOURCE 199309L
 
@@ -133,14 +134,19 @@ void dijkstra(Graph * graph, double * distances, double ** coord, int maxPortals
 }
 
 int main(){
+  resetGlobals();
   struct timespec inittp, endtp, restp;
   int retp;
   int n, m, k;
   double s;
   int q;
   scanf("%d %d %d", &n, &m, &k);
+  allocs++;
+  memoryUsage += n*sizeof(double *);
   double** coord = (double **) malloc(n*sizeof(double *)); // create a coordinates matrix
   for(int i = 0; i<n; i++){
+    allocs++;
+    memoryUsage += 2*sizeof(double);
     coord[i] = (double *) malloc(2*sizeof(double)); //take the coordinates from user
   }
   Graph * graph = createGraph(n, m, k);
@@ -169,6 +175,8 @@ int main(){
   }
   scanf("%lf %d", &s, &q);
 
+  allocs++;
+  memoryUsage += graph->size * sizeof(double);
   double * distances = (double *)malloc(graph->size * sizeof(double)); //creating the distances vector
 
   retp = clock_gettime(CLOCK_MONOTONIC, &inittp);
@@ -187,7 +195,7 @@ int main(){
   long a_star_sec = restp.tv_sec;
   long a_star_nsec = restp.tv_nsec;
   double a_star_distance = distances[graph->size-1];
-  printf("list,%d,%d,%d,%ld.%.9ld,%.4lf,%ld.%.9ld,%.4lf\n", n, m, k, dijkstra_sec, dijkstra_nsec, dijkstra_distance, a_star_sec, a_star_nsec, a_star_distance);
+  printf("list,%d,%d,%d,%ld.%.9ld,%.4lf,%ld.%.9ld,%.4lf,%ld,%ld\n", n, m, k, dijkstra_sec, dijkstra_nsec, dijkstra_distance, a_star_sec, a_star_nsec, a_star_distance, allocs, memoryUsage);
 
   int a_star_result = (distances[graph->size-1] <= s) ? 1 : 0; // simple test if the last distance is less than energy
   

@@ -1,11 +1,14 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include"graph.h"
+#include"config.h"
 
 Node * createNode(int vertex, int portal){
   /*
     Create new element of the adjacency list
   */
+  allocs++;
+  memoryUsage += sizeof(Node);
   Node * node = (Node *)malloc(sizeof(Node));
   node->vertex = vertex;
   node->portal = portal;
@@ -18,10 +21,14 @@ Graph * createGraph(int size, int totalPaths, int totalPortals){
   /*
     Create a new graph using adjacency list implementation
   */
+  allocs++;
+  memoryUsage += sizeof(Graph);
   Graph * graph = (Graph *)malloc(sizeof(Graph));
   graph->size = size;
   graph->totalPaths = totalPaths;
   graph->totalPortals = totalPortals;
+  allocs++;
+  memoryUsage += size*sizeof(Node*);
   graph->adjList = (Node **)malloc(size*sizeof(Node*));
 
   for(int i=0; i<size; i++){

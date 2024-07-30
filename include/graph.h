@@ -3,7 +3,7 @@
 
 typedef struct Node {
   /*
-  chained list that stores the vertex and if it is linked through a portal, points to the next element
+    chained list that stores the vertex and if it is linked through a portal, points to the next element
   */
   int vertex;
   int portal; // 0 or 1

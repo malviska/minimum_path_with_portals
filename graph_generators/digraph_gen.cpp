@@ -9,6 +9,8 @@
 #include <fstream>
 #include <time.h>
 #include <unistd.h>
+#include <unordered_set>
+#include <iterator>
 
 using namespace boost;
 
@@ -100,11 +102,11 @@ int main(int argc, char* argv[]) {
 
   std::uniform_real_distribution<> dis(0.0, 1.0);
   int numVertices = std::stoi(argv[1]);
-  double chanceOfEdge = std::stod(argv[2]);
-  double chanceOfPortal = std::stod(argv[3]);
+  int numPaths = std::stoi(argv[2]);
+  int numPortals = std::stoi(argv[3]);
   double quadrant = QUADRANT;
-  std::normal_distribution<> normalPath(chanceOfEdge*numVertices, std::sqrt(chanceOfEdge*numVertices));
-  std::normal_distribution<> normalPortal(chanceOfPortal*numVertices, std::sqrt(chanceOfPortal*numVertices));
+  //std::normal_distribution<> normalPath(chanceOfEdge*numVertices, std::sqrt(chanceOfEdge*numVertices));
+  //std::normal_distribution<> normalPortal(chanceOfPortal*numVertices, std::sqrt(chanceOfPortal*numVertices));
   std::uniform_real_distribution<> quad(-quadrant, quadrant);
   Graph graph;
   std::vector<Vertex> vrts;
@@ -112,8 +114,6 @@ int main(int argc, char* argv[]) {
   for(int i = 0; i< numVertices; i++){
     vrts.push_back(add_vertex({quad(gen), quad(gen)}, graph));
   }
-  int euclideanPaths = 0;
-  int portals = 0;
   // std::vector<int> visited(numVertices, 0);
   // int val = 0;
   // for(int i = 0; i< (int) numVertices*0.7; i++){
@@ -129,40 +129,42 @@ int main(int argc, char* argv[]) {
   // }
   // double weight = euclideanDistance(graph[vrts[val]], graph[vrts[numVertices - 1]]);
   // add_edge(vrts[val], vrts[numVertices - 1], EdgeTrait{weight}, graph);
-  for(int i = 0; i< numVertices; i++){
-    struct timespec inittp, endtp, restp;
-    int retp;
-    int random_value = std::round(normalPath(gen));
-    std::vector<int> neightbours(numVertices, 0);
-    neightbours[i] = 1;
-    int k = 0;
-    while(k<random_value){
-      int aleatory_vertex = std::rand() % numVertices;
-      if(neightbours[aleatory_vertex] == 1){
-        continue;
-      }
-      neightbours[aleatory_vertex] = 1;
-      double weight = euclideanDistance(graph[vrts[i]], graph[vrts[aleatory_vertex]]);
-      add_edge(vrts[i], vrts[aleatory_vertex], EdgeTrait{weight}, graph);
-      euclideanPaths++;
-      k++;
-    }
-    random_value = std::round(normalPortal(gen));
-    //std::cout<<"portals: "<<random_value<<std::endl;
-    k = 0;
-    while(k<random_value){
-      int aleatory_vertex = std::rand() % numVertices;
-      if(neightbours[aleatory_vertex] == 1){
-        continue;
-      }
-      neightbours[aleatory_vertex] = 1;
-      double weight = 0;
-      add_edge(vrts[i], vrts[aleatory_vertex], EdgeTrait{weight}, graph);
-      portals++;
-      k++;
+  std::vector<std::pair<int,int>> links;
+  for(int i = 0; i<numVertices-2; i++){
+    for(int j = i+1; j< numVertices-1; j++){
+      links.push_back({i,j});
     }
   }
+  //std::cout<<"checkpoint"<<links.size()<<'\n';
 
+  for(int i = 0; i< numPortals; i++){
+    //clock_t time0 = clock();
+    int randomIndex = std::rand() % links.size();
+    std::vector<std::pair<int,int>>::iterator it = links.begin();
+    //clock_t time1 = clock();
+    std::advance(it, randomIndex);
+    //clock_t time2 = clock();
+    double weight = 0;
+    add_edge(vrts[it->first], vrts[it->second], EdgeTrait{weight}, graph);
+    //clock_t time3 = clock();
+    links.erase(it);
+    //clock_t time4 = clock();
+   // std::cout<<time1-time0<<' '<<time2-time1<<' '<<time3 - time2 <<' '<<time4 - time3<<std::endl;
+  }
+
+  //std::cout<<"checkpoint\n";
+
+  for(int i = 0; i< numPaths; i++){
+    int randomIndex = std::rand() % links.size();
+    int k = 0;
+    auto it = links.begin();
+    std::advance(it, randomIndex);
+    double weight = euclideanDistance(graph[vrts[it->first]], graph[vrts[it->second]]);
+    add_edge(vrts[it->first], vrts[it->second], EdgeTrait{weight}, graph);
+    links.erase(it);
+  }
+
+  //std::cout<<"checkpoint\n";
   auto weightmap = boost::get(&EdgeTrait::weight, graph);
   std::vector<double> distances(num_vertices(graph), std::numeric_limits<double>::infinity());
   std::vector<Vertex> p(num_vertices(graph));
@@ -174,13 +176,13 @@ int main(int argc, char* argv[]) {
   clkDiff(inittp, endtp, &restp);
   //"list,%d,%d,%d,%ld.%.9ld,%.4lf,%ld.%.9ld,%.4lf,%ld,%ld\n", n, m, k, dijkstra_sec, dijkstra_nsec, dijkstra_distance, a_star_sec, a_star_nsec, a_star_distance, allocs, memoryUsage
   double finalDistance = distances[distances.size() - 1] == std::numeric_limits<double>::infinity()-1000 ? -1 : distances[distances.size() - 1];
-  std::cout<<"boost,"<<numVertices<< "," << euclideanPaths << "," << portals << "," << restp.tv_sec << "." << restp.tv_nsec << "," << finalDistance <<'\n';
+  std::cout<<"boost,"<<numVertices<< "," << numPaths << "," << numPortals << "," << restp.tv_sec << "." << restp.tv_nsec << "," << finalDistance <<'\n';
   // int vertx = numVertices -1;
   // while(vertx != 0 ){
   //   std::cout<<p[vertx]<<" ";
   //   vertx = p[vertx];
   // }
-  printGraph(graph, numVertices, portals, euclideanPaths, "./tests/graph.txt");
+  printGraph(graph, numVertices, numPortals, numPaths, "./tests/graph.txt");
 
   return 0;
   
